@@ -7,15 +7,20 @@ var handler = function (compileStep) {
         });
         var name = compileStep.inputPath.replace(/^.*[/]([^/]+).pegjs$/, '$1');
         compiled = "var " + name + " = " + compiled;
+        compileStep.addJavaScript({
+            path: compileStep.inputPath + '.js',
+            sourcePath: compileStep.inputPath,
+            data: compiled,
+            bare: true
+        });
     } catch (e) {
-        throw new Error(compileStep.inputPath + ':' + e.line + ':' + e.column
-                + ': ' + e.name + ' - ' + e.message);
+        compileStep.error({
+            sourcePath: compileStep.inputPath,
+            message: e.name + ': ' + e.message,
+            line: e.line,
+            column: e.column
+        });
     }
-    compileStep.addJavaScript({ 
-        path: compileStep.inputPath + '.js',
-        sourcePath: compileStep.inputPath,
-        data: compiled,
-        bare: true
-    });
+
 };
 Plugin.registerSourceHandler("pegjs", handler);
