@@ -6,12 +6,11 @@ var handler = function (compileStep) {
             output: "source"
         });
         var name = compileStep.inputPath.replace(/^.*[/]([^/]+).pegjs$/, '$1');
-        compiled = "var " + name + " = " + compiled;
+        compiled = name + " = " + compiled;
         compileStep.addJavaScript({
             path: compileStep.inputPath + '.js',
             sourcePath: compileStep.inputPath,
-            data: compiled,
-            bare: true
+            data: compiled
         });
     } catch (e) {
         compileStep.error({
