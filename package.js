@@ -1,6 +1,6 @@
 Package.describe({
     name: 'rzymek:pegjs',
-    version: '0.8.0_2',
+    version: '0.8.0_3',
     summary: 'PEG.js compiler',
     git: 'https://github.com/rzymek/meteor-pegjs.git'
 });
