@@ -1,18 +1,63 @@
-start
- = _ from:date _ "-" _ to:date _   { return {start:from, end:to } }
- / _ d:date _                      { return {start: d.clone().startOf('month'), end:d.clone().endOf('month') } }
+// line block
+start = line:(codeBlock / headerItem / taskItem / listItem / textItem) {
+ return line;
+}
 
-date
- = y:year [./] m:DIG2 [./] d:DIG2  { return moment({year:y,month:m-1, day:d}) }
- / y:year [./] m:DIG2              { return moment({year:y,month:m-1}) }
- / m:DIG2                          { return moment({month:m-1}) }
+// code block
+codeBlock = t:tab* ("'''" / "```") {
+ return {
+  level: t.length,
+  type: "code",
+  typeCode: 4
+ };
+}
 
-year = d4:DIG d3:DIG d2:DIG d1:DIG { return d4*1000 + d3*100 + d2*10 + d1 }
+// task item
+taskItem = t:tab* c:("[" bullet? space? "]") space* word+ {
+ return {
+  level: t.length,
+  type: "task",
+  typeCode: 3,
+  content: c.map(function (item) {if (item) return item;}).join("")
+ };
+}
 
-DIG2
- = d10:DIG d1:DIG                  { return d10*10 + d1 }
- / DIG
+// list item
+listItem = t:tab* c:(bullet / int+ "."? ")"?) space* word+ {
+ return {
+  level: t.length,
+  type: "list",
+  typeCode: 2,
+  content: c.length > 1 ? c.join("") : c
+ };
+}
 
-DIG = d:[0-9]                      { return parseInt(d) }
+// header item
+headerItem = t:tab* c:("#")+ space* word+ {
+ return {
+  level: t.length,
+  type: "header",
+  typeCode: 1,
+  content: c.join("")
+ }
+}
 
-_ = [ \t]*
+// text item
+textItem = t:tab* space* word+ {
+ return {
+  level: t.length,
+  type: "text",
+  typeCode: 0
+ }
+}
+
+// BASIC STRUCTURE //
+space = " "
+lb = "\n"
+tab = "\t" / "  "
+bullet = [-0o*+]
+char = [a-zA-Z()_#@*$.;,:!&{}\"]
+int = [0-9]
+word = w:(char / int)+ space? { return w.join(""); }
+
+
