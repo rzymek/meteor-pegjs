@@ -1,11 +1,12 @@
 var PEG = Npm.require("pegjs");
+var path = Npm.require("path");
 var handler = function (compileStep) {
     try {
         var fileContents = compileStep.read().toString('utf8');
         var compiled = PEG.buildParser(fileContents, {
             output: "source"
         });
-        var name = compileStep.inputPath.replace(/^.*[/]([^/]+).pegjs$/, '$1');
+        var name = path.basename(compileStep.inputPath, '.pegjs');
         compiled = name + " = " + compiled;
         compileStep.addJavaScript({
             path: compileStep.inputPath + '.js',
